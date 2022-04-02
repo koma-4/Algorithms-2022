@@ -2,6 +2,13 @@ package lesson1;
 
 import kotlin.NotImplementedError;
 
+import java.io.*;
+import java.nio.charset.StandardCharsets;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeMap;
+import java.util.TreeSet;
+
 @SuppressWarnings("unused")
 public class JavaTasks {
     /**
@@ -64,8 +71,33 @@ public class JavaTasks {
      *
      * В случае обнаружения неверного формата файла бросить любое исключение.
      */
+    // Трудоемкость(T): O(nlogn)
+    // Ресурсоемкость(R): O(n)
     static public void sortAddresses(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputName, StandardCharsets.UTF_8));
+             FileWriter writer = new FileWriter(new File(outputName), StandardCharsets.UTF_8)) {
+            String line;
+            TreeMap<String, TreeSet<String>> addressPeople = new TreeMap<>((ay1, ay2) ->{
+                String [] array1 = ay1.split(" ");
+                String [] array2 = ay2.split(" ");
+                if (array1[0].compareTo(array2[0])==0) {
+                    return Integer.compare(Integer.parseInt(array1[1]), Integer.parseInt(array2[1]));
+                } else return array1[0].compareTo(array2[0]);
+            });
+            while ((line = reader.readLine()) != null) {
+                String[] arrayOfLine = line.split(" - ");
+                if (!addressPeople.containsKey(arrayOfLine[1])) {
+                    addressPeople.put(arrayOfLine[1], new TreeSet<>());
+                }
+                addressPeople.get(arrayOfLine[1]).add(arrayOfLine[0]);
+            }
+            StringBuilder builder = new StringBuilder();
+            addressPeople.forEach((key, value)-> builder.append(key)
+                    .append(" - ").append(String.join(", ", value)).append("\n"));
+            writer.write(String.valueOf(builder));
+        } catch (IOException e) {
+                throw new NotImplementedError();
+        }
     }
 
     /**
@@ -98,8 +130,28 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
+    //Трудоемкость(T): O(n + k)
+    //Ресурсоемкость(R): O(n)
     static public void sortTemperatures(String inputName, String outputName) {
-        throw new NotImplementedError();
+        try (BufferedReader reader = new BufferedReader(new FileReader(inputName));
+             FileWriter writer = new FileWriter(outputName)) {
+            String line;
+            final int minX10 = 2730; // преобразуем таким образом в целое число, чтобы впоследствии удобно
+            // было применить сортировку для целых чисел методом countingSort()
+            List<Integer> arrayList = new ArrayList<>();
+            while ((line = reader.readLine()) != null) {
+                int numberX10 = Integer.parseInt(line.replace(".", ""));
+                numberX10 += minX10;
+                arrayList.add(numberX10);
+            }
+            int[] arrInt = new int[arrayList.size()];
+            for (int i = 0; i < arrayList.size(); i++) arrInt[i] = arrayList.get(i);
+            for (int value : Sorts.countingSort(arrInt, 7730)) {
+                writer.write(((float) value - minX10) / 10 + "\n");
+            }
+        } catch (IOException e) {
+            throw new NotImplementedError();
+        }
     }
 
     /**

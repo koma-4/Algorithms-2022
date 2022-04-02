@@ -2,7 +2,6 @@ package lesson3
 
 import org.junit.jupiter.api.Tag
 import org.junit.jupiter.api.Test
-
 class BinarySearchTreeTest : AbstractBinarySearchTreeTest() {
 
     override fun create(): CheckableSortedSet<Int> =

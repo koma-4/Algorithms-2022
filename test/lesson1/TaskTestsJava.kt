@@ -1,7 +1,10 @@
 package lesson1
 
 import org.junit.jupiter.api.Tag
+import java.lang.IllegalArgumentException
 import kotlin.test.Test
+import org.junit.jupiter.api.assertThrows
+
 
 class TaskTestsJava : AbstractTaskTests() {
 
@@ -15,12 +18,17 @@ class TaskTestsJava : AbstractTaskTests() {
     @Tag("4")
     fun testSortAddressesJava() {
         sortAddresses { inputName, outputName -> JavaTasks.sortAddresses(inputName, outputName) }
+        assertThrows<NotImplementedError> { JavaTasks.sortTimes("input/newAddr_in1.txt", "output.txt") }
+        assertThrows<NotImplementedError> { JavaTasks.sortTimes("input/newAddr_in2.txt", "output.txt") }
+        assertThrows<NotImplementedError> { JavaTasks.sortTimes("input/newAddr_in3.txt", "output.txt") }
     }
 
     @Test
     @Tag("4")
     fun testSortTemperaturesJava() {
         sortTemperatures { inputName, outputName -> JavaTasks.sortTemperatures(inputName, outputName) }
+        assertThrows<NotImplementedError> { JavaTasks.sortTimes("input/newTemp_in1.txt", "output.txt") }
+        assertThrows<NotImplementedError> { JavaTasks.sortTimes("input/newAddr_in2.txt", "output.txt") }
     }
 
     @Test

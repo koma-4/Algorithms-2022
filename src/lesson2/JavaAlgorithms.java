@@ -3,6 +3,8 @@ package lesson2;
 import kotlin.NotImplementedError;
 import kotlin.Pair;
 
+import java.util.Arrays;
+
 @SuppressWarnings("unused")
 public class JavaAlgorithms {
     /**
@@ -97,8 +99,26 @@ public class JavaAlgorithms {
      * Если имеется несколько самых длинных общих подстрок одной длины,
      * вернуть ту из них, которая встречается раньше в строке first.
      */
-    static public String longestCommonSubstring(String firs, String second) {
-        throw new NotImplementedError();
+    //Трудоемкость(T): O(first.length * second.length)
+    //Ресурсоемкость(R): O(first.length * second.length)
+    static public String longestCommonSubstring(String first, String second) {
+        if (first.isEmpty() || second.isEmpty()) return "";
+        int[][] array2D = new int[first.length()+1][first.length()+1];
+        int max = 0;
+        int maxLength = 0;
+        for (int i = 1; i <= first.length(); i++) {
+            for (int j = 1; j <= second.length(); j++) {
+                if (first.charAt(i-1)==second.charAt(j-1)) {
+                    int current = array2D[i-1][j-1] + 1;
+                    if (maxLength < current) {
+                        maxLength = current;
+                        max = i;
+                    }
+                    array2D[i][j] = current;
+                }
+            }
+        }
+        return first.substring(max-maxLength,max);
     }
 
     /**
@@ -111,7 +131,25 @@ public class JavaAlgorithms {
      * Справка: простым считается число, которое делится нацело только на 1 и на себя.
      * Единица простым числом не считается.
      */
+    //Трудоемкость(Т): O(NloglogN)
+    //Ресурсоемкость(R): O(N)
     static public int calcPrimesNumber(int limit) {
-        throw new NotImplementedError();
+        if (limit <= 1) return 0;
+        boolean[] array = new boolean[limit + 1];
+        Arrays.fill(array, true);
+        array[0] = false;
+        array[1] = false;
+        int falseCounter = 0;
+        for (int i = 2; i * i <= limit; i++) {
+            if (array[i]) {
+                for (int j = i * i; j <= limit; j += i) {
+                    if (array[j]) {
+                        array[j] = false;
+                        falseCounter++;
+                    }
+                }
+            }
+        }
+        return limit - 1 - falseCounter;
     }
 }

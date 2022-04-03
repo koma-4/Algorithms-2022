@@ -8,8 +8,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 // attention: Comparable is supported but Comparator is not
-public abstract class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> implements CheckableSortedSet<T> {
-
+public class BinarySearchTree<T extends Comparable<T>> extends AbstractSet<T> implements CheckableSortedSet<T> {
 
     private static class Node<T> {
         final T value;
@@ -156,6 +155,7 @@ public abstract class BinarySearchTree<T extends Comparable<T>> extends Abstract
         return null;
     }
 
+
     @NotNull
     @Override
     public Iterator<T> iterator() {
@@ -214,7 +214,7 @@ public abstract class BinarySearchTree<T extends Comparable<T>> extends Abstract
         //Ассимптотика О(logN)
         @Override
         public T next() {
-            if (nodeStack.isEmpty()) throw new IllegalStateException();
+            if (nodeStack.isEmpty()) throw new NoSuchElementException();
             Node<T> now = nodeStack.pop();
             if (now.right != null) pushToStack(now.right);
             nowNode = now;
@@ -241,6 +241,7 @@ public abstract class BinarySearchTree<T extends Comparable<T>> extends Abstract
             BinarySearchTree.this.remove(nowNode.value);
             nowNode = null;
         }
+    }
 
 
         /**
@@ -302,13 +303,12 @@ public abstract class BinarySearchTree<T extends Comparable<T>> extends Abstract
          * Сложная
          */
         @NotNull
-        //@Override
+
         public SortedSet<T> tailSet(T fromElement) {
             // TODO
             throw new NotImplementedError();
         }
-
-
+        @Override
         public T first() {
             if (root == null) throw new NoSuchElementException();
             Node<T> current = root;
@@ -318,7 +318,7 @@ public abstract class BinarySearchTree<T extends Comparable<T>> extends Abstract
             return current.value;
         }
 
-
+        @Override
         public T last() {
             if (root == null) throw new NoSuchElementException();
             Node<T> current = root;
@@ -348,5 +348,4 @@ public abstract class BinarySearchTree<T extends Comparable<T>> extends Abstract
             return right == null || right.value.compareTo(node.value) > 0 && checkInvariant(right);
         }
 
-    }
 }

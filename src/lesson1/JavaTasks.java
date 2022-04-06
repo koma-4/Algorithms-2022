@@ -62,8 +62,7 @@ public class JavaTasks {
      * Людей в городе может быть до миллиона.
      *
      * Вывести записи в выходной файл outputName,
-     * упорядоченными по названию улицы (по алфавиту) и номеру дома (по возрастанию).
-     * Людей, живущих в одном доме, выводить через запятую по алфавиту (вначале по фамилии, потом по имени). Пример:
+     * упорядоченными по названию улицы (по алфавиту) и номеру дома (по возрастан* Людей, живущих в одном доме, выводить через запятую по алфавиту (вначале по фамилии, потом по имени). Пример:
      *
      * Железнодорожная 3 - Петров Иван
      * Железнодорожная 7 - Иванов Алексей, Иванов Михаил
@@ -73,7 +72,7 @@ public class JavaTasks {
      */
     // Трудоемкость(T): O(nlogn)
     // Ресурсоемкость(R): O(n)
-    static public void sortAddresses(String inputName, String outputName) {
+    static public void sortAddresses(String inputName, String outputName) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(inputName, StandardCharsets.UTF_8));
              FileWriter writer = new FileWriter(new File(outputName), StandardCharsets.UTF_8)) {
             String line;
@@ -95,8 +94,6 @@ public class JavaTasks {
             addressPeople.forEach((key, value)-> builder.append(key)
                     .append(" - ").append(String.join(", ", value)).append("\n"));
             writer.write(String.valueOf(builder));
-        } catch (IOException e) {
-                throw new NotImplementedError();
         }
     }
 
@@ -130,9 +127,12 @@ public class JavaTasks {
      * 99.5
      * 121.3
      */
-    //Трудоемкость(T): O(n + k)
+    //Трудоемкость(T): O(n + k) эквивалентно О(n), k брала как некую константу(погрешность)
+    // (Когда искала, как считается трудоемкость, наткнулась на поинт о том, что учитывая лишь пропорциональность,
+    // в данном случае длины массива, время работы может существенно отличаться,
+    // поэтому берётся так называемая погрешность. Мысль показалась логичной, решила так и написать)
     //Ресурсоемкость(R): O(n)
-    static public void sortTemperatures(String inputName, String outputName) {
+    static public void sortTemperatures(String inputName, String outputName) throws IOException {
         try (BufferedReader reader = new BufferedReader(new FileReader(inputName));
              FileWriter writer = new FileWriter(outputName)) {
             String line;
@@ -149,8 +149,6 @@ public class JavaTasks {
             for (int value : Sorts.countingSort(arrInt, 7730)) {
                 writer.write(((float) value - minX10) / 10 + "\n");
             }
-        } catch (IOException e) {
-            throw new NotImplementedError();
         }
     }
 

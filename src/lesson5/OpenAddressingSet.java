@@ -5,6 +5,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.AbstractSet;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 public class OpenAddressingSet<T> extends AbstractSet<T> {
@@ -16,6 +17,10 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     private final Object[] storage;
 
     private int size = 0;
+
+    private enum Status {
+        DELETED
+    }
 
     private int startingIndex(Object element) {
         return element.hashCode() & (0x7FFFFFFF >> (31 - bits));
@@ -67,7 +72,7 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
         int startingIndex = startingIndex(t);
         int index = startingIndex;
         Object current = storage[index];
-        while (current != null) {
+        while (current != null && current != Status.DELETED) {
             if (current.equals(t)) {
                 return false;
             }
@@ -93,9 +98,23 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
      *
      * Средняя
      */
+
+    // Трудоёмкость Т: О(1) в лучшем и О(N) в худшем случае
+    // Ресурскоёмкость R: O(1)
     @Override
     public boolean remove(Object o) {
-        return super.remove(o);
+        int index = startingIndex(o);
+        Object removable = storage[index];
+        while (removable != null) {
+            if (removable.equals(o)) {
+                storage[index] = Status.DELETED;
+                size--;
+                return true;
+            }
+            index = (index + 1) % capacity;
+            removable = storage[index];
+        }
+        return false;
     }
 
     /**
@@ -111,7 +130,50 @@ public class OpenAddressingSet<T> extends AbstractSet<T> {
     @NotNull
     @Override
     public Iterator<T> iterator() {
-        // TODO
-        throw new NotImplementedError();
+        return new OpenAddressingIterator();
+    }
+
+    public class OpenAddressingIterator implements Iterator<T> {
+        T current = null;
+        int index = 0;
+        int counter = 0;
+
+        // Трудоёмкость Т: О(1)
+        // Ресурскоёмкость R: O(1)
+        @Override
+        public boolean hasNext() {
+            return counter < size;
+        }
+
+        // Трудоёмкость Т: О(1)
+        // Ресурскоёмкость R: O(1)
+        @Override
+        public T next() {
+            if (hasNext()) {
+                while (storage[index] == null || storage[index] == Status.DELETED) {
+                    index++;
+                }
+                current = (T) storage[index];
+                index++;
+                counter++;
+                return current;
+            } else {
+                throw new NoSuchElementException();
+            }
+        }
+
+        // Трудоёмкость Т: О(1)
+        // Ресурскоёмкость R: O(1)
+        @Override
+        public void remove() {
+            if (current != null) {
+                storage[--index] = Status.DELETED;
+                current = null;
+                size--;
+                counter--;
+            } else {
+                throw new IllegalStateException();
+            }
+        }
     }
 }

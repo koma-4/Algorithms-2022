@@ -2,8 +2,7 @@ package lesson6;
 
 import kotlin.NotImplementedError;
 
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @SuppressWarnings("unused")
 public class JavaGraphTasks {
@@ -93,9 +92,42 @@ public class JavaGraphTasks {
      *
      * Если на входе граф с циклами, бросить IllegalArgumentException
      */
+    // Трудоёмкость Т: О(вершины * рёбра)
+    // Ресурскоёмкость R: O(вершины)
     public static Set<Graph.Vertex> largestIndependentVertexSet(Graph graph) {
-        throw new NotImplementedError();
+        Set<Graph.Vertex> vertices = graph.getVertices();
+        Set<Graph.Vertex> answer = new HashSet<>();
+        if (vertices.isEmpty()) {
+            return Collections.emptySet();
+        }
+        if (new Path().isLoop(graph)) throw new IllegalArgumentException();
+        for (Graph.Vertex vertex:vertices) {
+            ArrayDeque<Graph.Vertex> stack = new ArrayDeque<>();
+            Set<Graph.Vertex> possibleAnswer = new HashSet<>();
+            Set<Graph.Vertex> processed = new HashSet<>();
+            stack.add(vertex);
+            processed.add(vertex);
+            while (!stack.isEmpty() || processed.size() != vertices.size()) {
+                if (stack.isEmpty()) {
+                    vertices.stream().filter(vertex1 -> !processed.contains(vertex1)).forEach(stack::add);
+                }
+                Graph.Vertex current = stack.pop();
+                processed.add(current);
+                for (Graph.Vertex currentVertex: graph.getNeighbors(current)) {
+                    processed.add(currentVertex);
+                    stack.remove(currentVertex);
+                    graph.getNeighbors(currentVertex).stream().filter(vertex1 -> !processed.contains(vertex1))
+                            .forEach(stack::add);
+                }
+                possibleAnswer.add(current);
+            }
+            if (answer.size() < possibleAnswer.size()) {
+                answer = possibleAnswer;
+            }
+        }
+        return answer;
     }
+
 
     /**
      * Наидлиннейший простой путь.
@@ -117,8 +149,22 @@ public class JavaGraphTasks {
      *
      * Ответ: A, E, J, K, D, C, H, G, B, F, I
      */
+    // Трудоёмкость Т: О(вершины + рёбра)
+    // Ресурскоёмкость R: O(вершины)
     public static Path longestSimplePath(Graph graph) {
-        throw new NotImplementedError();
+        Path longest = new Path();
+        Deque<Path> paths = new ArrayDeque<>();
+        graph.getVertices().forEach(vertex -> paths.add(new Path(vertex)));
+        if (paths.isEmpty()) return longest;
+        while (!paths.isEmpty()) {
+            Path current = paths.pollLast();
+            int currentLength = current.getLength();
+            longest = currentLength < longest.getLength() ? longest : current;
+            graph.getNeighbors(current.getVertices().get(currentLength)).stream()
+                    .filter(vertex -> !current.contains(vertex))
+                    .forEach(vertex -> paths.add(new Path(current, graph, vertex)));
+        }
+        return longest;
     }
 
 
